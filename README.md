@@ -2,12 +2,11 @@
 
 ## Features
 
-- **Task Creation:** Add tasks to the respective priority lists.
+- **Task Creation:** Add tasks to the respective types.
 - **Edit Task:** Modify task details such as the task name and description.
 - **Delete Task:** Remove tasks when they are no longer needed.
-- **Priority Management:** Move tasks between priority lists like Todo,Inprogress,Done.
-- **Visual Representation:** Each priority list is color-coded for quick identification.
-
+- **Status Management:** Move tasks between statuses like Todo,Inprogress,Done.
+- **Visual Representation:** Each layout  is color-coded for quick identification.
 
 
 ## Getting Started
@@ -61,19 +60,9 @@ Follow these instructions to get a copy of the project up and running on your lo
 - [React](https://reactjs.org/) - JavaScript library for building user interfaces.
 - [Tailwind CSS](https://tailwindcss.com/) - Library for adding beautiful Styling With Responsive Design.
 
-## Contributing
 
-Contributions are welcome! Fork the repository and create a pull request with your changes.
 
-## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
 
-- Hat tip to anyone whose code was used as inspiration.
-- Thanks to the React and open-source community for their amazing work.
 
----
-
-Feel free to customize this README according to your project's needs. Good luck with your React Task Management app! If you have any questions or need further assistance, don't hesitate to reach out.
