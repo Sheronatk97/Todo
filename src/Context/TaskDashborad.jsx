@@ -1,51 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import Layout from "./Layout";
 
-const TaskDashborad = () => {
+const TaskDashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [textInput, setTextInput] = useState("");
   const [selectedPriority, setSelectedPriority] = useState("Todo");
   const [selectedTask, setSelectedTask] = useState(null);
 
-  // UseEffect For StoredTasks in Local Stroage
+  // UseEffect For StoredTasks in Local Storage
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks));
     }
   }, []);
+
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  // With Help Of State Management We Handle Input Change
-  const handleTextInputChange = (event) => {
-    setTextInput(event.target.value);
-  };
-  // handlePriorityChange
-  const handlePriorityChange = (event) => {
-    setSelectedPriority(event.target.value);
-  };
+  const handleTextInputChange = (event) => setTextInput(event.target.value);
+  const handlePriorityChange = (event) => setSelectedPriority(event.target.value);
 
-  // Handle Function When Click On Submit
   const handleTaskSubmit = () => {
-    if (textInput.trim() === "") {
-      return;
-    }
-    // Selecting The New Task To Put
-    const newTask = {
-      text: textInput,
-      priority: selectedPriority,
-    };
-
+    if (textInput.trim() === "") return;
+    const newTask = { text: textInput, priority: selectedPriority };
     setTasks([...tasks, newTask]);
     setTextInput("");
     setSelectedPriority("Todo");
   };
 
-  const getTasksByPriority = (priority) => {
-    return tasks.filter((task) => task.priority === priority);
-  };
+  const getTasksByPriority = (priority) => tasks.filter((task) => task.priority === priority);
+
   const handleEditTask = (updatedTask) => {
     const updatedTasks = tasks.map((task) =>
       task === selectedTask ? updatedTask : task
@@ -53,7 +41,7 @@ const TaskDashborad = () => {
     setTasks(updatedTasks);
     setSelectedTask(null);
   };
-  
+
   const handleChangePriority = (updatedTask) => {
     const updatedTasks = tasks.map((task) =>
       task === selectedTask ? updatedTask : task
@@ -61,45 +49,49 @@ const TaskDashborad = () => {
     setTasks(updatedTasks);
     setSelectedTask(null);
   };
-  
+
   const handleDeleteTask = (taskToDelete) => {
     const updatedTasks = tasks.filter((task) => task !== taskToDelete);
     setTasks(updatedTasks);
     setSelectedTask(null);
   };
-  
+
+  const moveTaskToNewPriority = (task, newPriority) => {
+    const updatedTasks = tasks.map((t) =>
+      t === task ? { ...t, priority: newPriority } : t
+    );
+    setTasks(updatedTasks);
+  };
 
   return (
-    <div className="p-8">
-      <div className="lg:flex grid gap-2 items-center font-main">
-        <div className="">
+    <DndProvider backend={HTML5Backend}>
+      <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="lg:flex grid gap-4 items-center font-main mb-6">
           <input
             type="text"
             value={textInput}
             onChange={handleTextInputChange}
-            className="w-full lg:w-96 border rounded p-2"
+            className="w-full lg:w-96 border rounded p-2 shadow-md focus:outline-none"
             placeholder="Enter task"
           />
-        </div>
-        <div className="">
-        
           <select
-  value={selectedPriority}
-  onChange={handlePriorityChange}
-  className="w-full border rounded p-2"
->
-  <option value="Todo">Todo</option>
-  <option value="In Progress">In Progress</option> 
-  <option value="Done">Done</option>
-</select>
+            value={selectedPriority}
+            onChange={handlePriorityChange}
+            className="w-full lg:w-48 border rounded p-2 shadow-md focus:outline-none"
+          >
+            <option value="Todo">Todo</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+          <button
+            onClick={handleTaskSubmit}
+            className="bg-blue-600 text-white p-3 rounded-lg shadow-md hover:bg-blue-700 transition"
+          >
+            Add Task
+          </button>
         </div>
-        <button onClick={handleTaskSubmit} className="btn btn-secondary">
-          Add Task
-        </button>
-      </div>
 
-      <div className="mt-8 space-y-4 text-black ">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Todo Priority */}
           <Layout
             getTasksByPriority={getTasksByPriority}
@@ -108,9 +100,10 @@ const TaskDashborad = () => {
             handleEditTask={handleEditTask}
             handleChangePriority={handleChangePriority}
             handleDeleteTask={handleDeleteTask}
+            moveTaskToNewPriority={moveTaskToNewPriority}
             level="Todo"
           />
-          {/* Inprogress Priority */}
+          {/* In Progress Priority */}
           <Layout
             getTasksByPriority={getTasksByPriority}
             setSelectedTask={setSelectedTask}
@@ -118,6 +111,7 @@ const TaskDashborad = () => {
             handleEditTask={handleEditTask}
             handleChangePriority={handleChangePriority}
             handleDeleteTask={handleDeleteTask}
+            moveTaskToNewPriority={moveTaskToNewPriority}
             level="In Progress"
           />
           {/* Done Priority */}
@@ -128,12 +122,13 @@ const TaskDashborad = () => {
             handleEditTask={handleEditTask}
             handleChangePriority={handleChangePriority}
             handleDeleteTask={handleDeleteTask}
+            moveTaskToNewPriority={moveTaskToNewPriority}
             level="Done"
           />
         </div>
       </div>
-    </div>
+    </DndProvider>
   );
 };
 
-export default TaskDashborad;
+export default TaskDashboard;

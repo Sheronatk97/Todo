@@ -1,63 +1,88 @@
-import React from "react";
+import { useDrag, useDrop } from "react-dnd";
 import Action from "./Action";
 
-function Layout(props) {
-  const getColumnStyle = (level) => {
-    switch (level) {
-      case "Todo":
-        return {
-          bg: "bg-blue-100",
-          header: "text-blue-700 border-blue-300",
-        };
-      case "In Progress":
-        return {
-          bg: "bg-yellow-100",
-          header: "text-yellow-700 border-yellow-300",
-        };
-      case "Done":
-        return {
-          bg: "bg-green-100",
-          header: "text-green-700 border-green-300",
-        };
-      default:
-        return {
-          bg: "bg-gray-100",
-          header: "text-gray-700 border-gray-300",
-        };
-    }
-  };
+const columnStyles = {
+  Todo: "bg-blue-100 text-blue-800 border-blue-300",
+  "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-300",
+  Done: "bg-green-100 text-green-800 border-green-300",
+};
 
-  const styles = getColumnStyle(props.level);
+function Layout(props) {
+  const { level, getTasksByPriority, moveTaskToNewPriority } = props;
+
+  const [, drop] = useDrop({
+    accept: "TASK",
+    drop: (item) => {
+      if (item.priority !== level) {
+        moveTaskToNewPriority(item.task, level);  // Move the task to the new column
+      }
+    },
+  });
 
   return (
-    <div className={`w-80 flex-shrink-0 rounded-md shadow-md border ${styles.header} p-4 ${styles.bg}`}>
-      <h2 className={`text-lg font-semibold text-center mb-4 ${styles.header}`}>
-        {props.level}
-      </h2>
-      <div className="space-y-3">
-        {props.getTasksByPriority(props.level).map((task, index) => (
-          <div
+    <div
+      ref={drop}
+      className={`w-full p-4 rounded-lg shadow-md ${columnStyles[level]} border-l-8 border-opacity-75`}
+    >
+      <h2 className="text-2xl font-semibold text-center mb-6">{level}</h2>
+      <div className="space-y-4">
+        {getTasksByPriority(level).map((task, index) => (
+          <TaskItem
             key={index}
-            className="bg-white p-3 rounded shadow hover:shadow-lg transition"
-          >
-            <p
-              className="text-base cursor-pointer font-medium text-gray-800"
-              onClick={() => props.setSelectedTask(task)}
-            >
-              {task.text}
-            </p>
-            {props.selectedTask === task && (
-              <Action
-                priority={props.level}
-                handleEditTask={props.handleEditTask}
-                handleChangePriority={props.handleChangePriority}
-                handleDeleteTask={props.handleDeleteTask}
-                selectedTask={props.selectedTask}
-              />
-            )}
-          </div>
+            task={task}
+            level={level}
+            handleEditTask={props.handleEditTask}
+            handleChangePriority={props.handleChangePriority}
+            handleDeleteTask={props.handleDeleteTask}
+            setSelectedTask={props.setSelectedTask}
+            selectedTask={props.selectedTask}
+            moveTaskToNewPriority={moveTaskToNewPriority}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+function TaskItem({
+  task,
+  level,
+  handleEditTask,
+  handleChangePriority,
+  handleDeleteTask,
+  setSelectedTask,
+  selectedTask,
+  moveTaskToNewPriority,
+}) {
+  const [{ isDragging }, drag] = useDrag({
+    type: "TASK",
+    item: { task, priority: level },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  return (
+    <div
+      ref={drag}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className="bg-white p-4 rounded-lg shadow hover:shadow-xl transition cursor-pointer"
+    >
+      <p
+        className="text-lg font-medium text-gray-800 mb-2"
+        onClick={() => setSelectedTask(task)}
+      >
+        {task.text}
+      </p>
+      {selectedTask === task && (
+        <Action
+          priority={level}
+          handleEditTask={handleEditTask}
+          handleChangePriority={handleChangePriority}
+          handleDeleteTask={handleDeleteTask}
+          selectedTask={selectedTask}
+        />
+      )}
     </div>
   );
 }

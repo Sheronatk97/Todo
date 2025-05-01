@@ -28,22 +28,22 @@ const Action = ({
   };
 
   return (
-    <div className="mt-2 space-x-2">
+    <div className="mt-2 space-x-2 flex justify-center">
       <button
         onClick={onEdit}
-        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded"
+        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-lg transition"
       >
         Edit
       </button>
       <button
         onClick={onChangePriority}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded"
+        className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-lg transition"
       >
         Change Priority
       </button>
       <button
         onClick={onDelete}
-        className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded"
+        className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-lg transition"
       >
         Delete
       </button>
